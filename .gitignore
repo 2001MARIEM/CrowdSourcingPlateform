@@ -1,0 +1,41 @@
+# .gitignore à la racine du projet (platforme-evaluation)
+
+# Backend (Django)
+# Fichiers Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Dossiers de l'environnement virtuel
+venv/
+env/
+
+# Fichiers de logs
+*.log
+
+# Fichiers de base de données SQLite
+*.sqlite3
+
+# Fichiers d'environnement (par exemple, clés API, variables d'environnement)
+.env
+
+# Frontend (React)
+# Dossiers spécifiques à Node.js
+node_modules/
+
+# Fichiers de log générés par Node.js
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Dossier de build (produit par React lors de la construction)
+build/
+
+# Dossier de cache
+.cache/
+
+# Fichiers de configuration d'IDE
+.vscode/
+.idea/
+
