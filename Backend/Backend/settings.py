@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from mongoengine import connect
 
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,9 +53,11 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'accounts.authentication.MongoJWTAuthentication',  # Chemin vers ta classe custom
     ),
 }
+
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -97,18 +99,13 @@ WSGI_APPLICATION = "Backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'CrowdSourcing_Plateform_BD',  
-        'ENFORCE_SCHEMA': False,      
-        'CLIENT': {
-            'host': 'mongodb://localhost:27017',      
-            'port': 27017,            
-            
-        }
-    }
-}
+
+
+connect(
+    db='CrowdSourcing_Plateform_BD',         # nom de la base Mongo
+    host='localhost',          # ou l'URL du serveur MongoDB
+    port=27017                 # ou le port MongoDB que tu utilises
+)
 
 
 # Password validation
