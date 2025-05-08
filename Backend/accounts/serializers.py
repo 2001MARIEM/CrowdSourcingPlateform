@@ -32,15 +32,24 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         email = data['email']
         password = data['password']
+        
+        # Vérification de l'existence de l'utilisateur avec l'email
         try:
             user = CustomUser.objects.get(email=email)
-            if not user.check_password(password):  # ✅ Vérification sécurisée
-                raise serializers.ValidationError("Mot de passe incorrect.")
-            if not user.is_active:
-                raise serializers.ValidationError("Compte désactivé.")
-            return user
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError("Email non trouvé.")
+
+        # Vérification du mot de passe
+        if not user.check_password(password):
+            raise serializers.ValidationError("Mot de passe incorrect.")
+
+        # Vérification du statut de l'utilisateur
+        if not user.is_active:
+            raise serializers.ValidationError("Compte désactivé.")
+
+        # Si tout est valide, renvoyer l'utilisateur dans les validated_data
+        data['user'] = user
+        return data
 
 class UserProfileSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
@@ -50,6 +59,7 @@ class UserProfileSerializer(serializers.Serializer):
     age = serializers.IntegerField(required=False)
     secteur_activite = serializers.CharField(max_length=100, required=False)
     date_joined = serializers.DateTimeField(read_only=True)
+   
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():

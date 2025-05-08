@@ -42,16 +42,21 @@ class CreateAdminUserView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data
-            refresh = RefreshToken.for_user(user)  # JWT ne vérifie pas automatiquement MongoEngine user
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            })
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        try:
+            serializer = LoginSerializer(data=request.data)
+            if serializer.is_valid():
+                user = serializer.validated_data['user']
+                refresh = RefreshToken.for_user(user)
+                user_role = 'admin' if user.is_staff and user.is_superuser else 'evaluator'
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'userRole': user_role,
+                })
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"Error during login: {e}")
+            return Response({"error": "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
