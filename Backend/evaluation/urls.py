@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import GetRandomMediaView, EvaluateMediaView, CompositeMapView,ListEvaluationsView,UserEvaluationHistoryView, UpdateEvaluationView
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     #evaluateur
     path('media/random/<str:media_type>/', GetRandomMediaView.as_view(), name='random-media'),
@@ -13,3 +14,5 @@ urlpatterns = [
     path('view_evaluations_admin/', ListEvaluationsView.as_view(), name='list-evaluations'),
     path('map/composite/<int:year>/', CompositeMapView.as_view(), name='composite-map'),
 ]
+#urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
