@@ -1,7 +1,8 @@
 from mongoengine import Document, StringField, EmailField, BooleanField, IntField, DateTimeField
 from django.utils import timezone
 import bcrypt 
-
+from datetime import datetime, timedelta
+import uuid
 class CustomUser(Document):
     email = EmailField(required=True, unique=True)
     password = StringField(required=True)
@@ -12,7 +13,12 @@ class CustomUser(Document):
     is_active = BooleanField(default=True)
     is_staff = BooleanField(default=False)
     is_superuser = BooleanField(default=False)
+    is_chercheur = BooleanField(default=False)
     date_joined = DateTimeField(default=timezone.now)
+
+    #pour mdp oublier
+    reset_token = StringField()
+    reset_token_expiry = DateTimeField()
 
     meta = {'collection': 'custom_users'}
 

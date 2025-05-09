@@ -124,9 +124,17 @@ class IsAdminUser(permissions.BasePermission):
         return request.user and request.user.is_authenticated and request.user.is_staff   
     
 
+
+class IsAdminOrChercheur(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated and (
+            request.user.is_staff or getattr(request.user, 'is_chercheur', False)
+        )
+    
+
 #l'admin peut voir toutes les evaluations soumises
 class ListEvaluationsView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminOrChercheur]
 
     def get(self, request):
         evaluations = MediaEvaluation.objects().order_by('-created_at')
