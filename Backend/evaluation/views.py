@@ -14,6 +14,10 @@ from collections import defaultdict
 from datetime import timedelta
 from django.utils import timezone
 from django.utils.timezone import is_naive, make_aware
+from django.http import JsonResponse
+from django.utils.encoding import smart_str
+import json
+from django.http import HttpResponse
 
 
 class IsEvaluator(permissions.BasePermission):
@@ -132,7 +136,7 @@ class IsAdminOrChercheur(permissions.BasePermission):
         )
     
 
-#l'admin peut voir toutes les evaluations soumises
+#l'admin ou le chercheur peuvent  voir toutes les evaluations soumises
 class ListEvaluationsView(APIView):
     permission_classes = [IsAdminOrChercheur]
 
@@ -143,6 +147,19 @@ class ListEvaluationsView(APIView):
             return Response({"message": "Aucune évaluation enregistrée."}, status=404)
 
         serializer = MediaEvaluationAdminSerializer(evaluations, many=True)
+
+        # Vérifie si l'utilisateur veut télécharger
+        if request.query_params.get('download') == 'true':
+            data_json = json.dumps(serializer.data, ensure_ascii=False, indent=2)
+
+            response = HttpResponse(
+                data_json,
+                content_type='application/json'
+            )
+            response['Content-Disposition'] = 'attachment; filename="evaluations.json"'
+            return response
+
+        # Sinon retourne la réponse normale JSON dans l'API
         return Response(serializer.data)
     
 

@@ -64,7 +64,7 @@ class MediaEvaluationDetailSerializer(serializers.Serializer):
 
 
     
-#serializer pour l'admin :plus détaillé stha9itou fi consulter les evaluation
+#serializer pour l'admin et le chercheur  :plus détaillé stha9itou fi consulter les evaluation
 class MediaEvaluationAdminSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     evaluator_email = serializers.SerializerMethodField()
