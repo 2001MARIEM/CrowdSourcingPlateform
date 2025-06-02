@@ -52,11 +52,11 @@ const Evaluator = (props) => {
       <EvaluatorSidebar
         {...props}
         routes={routes}
-        logo={{
-          innerLink: "/evaluator/dashboard",
-          imgSrc: require("../assets/img/brand/argon-react.png"),
-          imgAlt: "...",
-        }}
+        // logo={{
+        //   innerLink: "/evaluator/dashboard",
+        //   imgSrc: require("../assets/img/brand/argon-react.png"),
+        //   imgAlt: "...",
+        // }}
       />
       <div className="main-content" ref={mainContent}>
         <EvaluatorNavbar

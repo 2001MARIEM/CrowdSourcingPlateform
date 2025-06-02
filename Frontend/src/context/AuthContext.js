@@ -1,6 +1,6 @@
-import { createContext, useContext, useState,useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, registerUser, getUserProfile } from "../services/api"; // Ajout de getUserProfile
+import { loginUser, registerUser, getUserProfile } from "../services/api";
 
 const AuthContext = createContext();
 
@@ -8,28 +8,44 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Commencez avec loading=true
   const navigate = useNavigate();
+
   // Récupérer les informations de l'utilisateur depuis localStorage au démarrage
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
     const userRole = localStorage.getItem("userRole");
 
     if (accessToken && userRole) {
-      const fetchUserProfile = async () => {
-        try {
-          // Récupérer le profil utilisateur
-          const profile = await getUserProfile(accessToken);
-          const userData = { role: userRole, ...profile };
-          setUser(userData);
-        } catch (error) {
-          console.error(
-            "Erreur lors de la récupération du profil utilisateur",
-            error
-          );
-        }
-      };
-      fetchUserProfile();
+      // Si l'utilisateur est un admin, pas besoin de récupérer le profil
+      if (userRole === "admin") {
+        console.log("Utilisateur admin, pas besoin de récupérer le profil");
+        setUser({ role: userRole });
+        setLoading(false);
+      } else {
+        // Pour les évaluateurs, récupérer le profil
+        const fetchUserProfile = async () => {
+          try {
+            // Récupérer le profil utilisateur
+            const profile = await getUserProfile(accessToken);
+            const userData = { role: userRole, ...profile };
+            setUser(userData);
+          } catch (error) {
+            console.error(
+              "Erreur lors de la récupération du profil utilisateur",
+              error
+            );
+            // En cas d'erreur, on définit quand même l'utilisateur avec son rôle
+            setUser({ role: userRole });
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchUserProfile();
+      }
+    } else {
+      // Pas de token ou de rôle, utilisateur non connecté
+      setLoading(false);
     }
   }, []);
 
@@ -63,7 +79,7 @@ export const AuthProvider = ({ children }) => {
         userData = { ...userData, ...profile };
       }
 
-      // 5. Mise à jour de l’état utilisateur
+      // 5. Mise à jour de l'état utilisateur
       setUser(userData);
 
       // 6. Redirection

@@ -328,7 +328,198 @@ export const updateEvaluation = async (evaluationId, ratings, comment) => {
     };
   }
 };
- 
+// Dans api.js
+export const fetchMapDataByYear = async (year) => {
+  try {
+    // Récupérer le token depuis le localStorage
+    const token = localStorage.getItem("access_token");
+    
+    // Vérifier si le token existe
+    if (!token) {
+      throw new Error("Token d'authentification manquant");
+    }
+    
+    // Envoyer la requête avec le token dans l'en-tête Authorization
+    const response = await axios.get(`http://127.0.0.1:8000/api/evaluation/map/composite/${year}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données de carte:", error);
+    throw error;
+  }
+};
+// Fonction pour récupérer les évaluations admin
+export const getAdminEvaluations = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/evaluation/view_evaluations_admin/?download=false`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur récupération évaluations admin:", error);
+    return { 
+      error: true, 
+      message: error.response?.data || error.message,
+      status: error.response?.status 
+    };
+  }
+};
 
+// Fonction pour télécharger les évaluations au format JSON
+export const downloadAdminEvaluations = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/evaluation/view_evaluations_admin/?download=true`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob", // Important pour télécharger le fichier
+      }
+    );
+    
+    // Créer un blob et télécharger le fichier
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'evaluations.json');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    return { error: false };
+  } catch (error) {
+    console.error("Erreur téléchargement évaluations:", error);
+    return { 
+      error: true, 
+      message: error.response?.data || error.message,
+      status: error.response?.status 
+    };
+  }
+};
+export const getEvaluatorsList = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await api.get(
+      `http://127.0.0.1:8000/api/accounts/admin/evaluateurs/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur lors de la récupération des évaluateurs:", error);
+    return {
+      error: true,
+      message:
+        error.response?.data?.message ||
+        "Une erreur est survenue lors de la récupération des évaluateurs.",
+    };
+  }
+};
+export const DisableUser = async (userId) => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await api.post(
+      `/accounts/admin/desactiver/${userId}/`,
+      {}, // Le deuxième paramètre est le corps de la requête (même vide)
+      {
+        headers: {
+          // Le troisième paramètre est pour les options, y compris les headers
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur lors de la désactivation de l'utilisateur:", error);
+    return {
+      error: true,
+      message:
+        error.response?.data?.message ||
+        "Une erreur est survenue lors de la désactivation de l'utilisateur.",
+    };
+  }
+};
+
+export const ActivateUser = async (userId) => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await api.post(
+      `/accounts/admin/reactiver/${userId}/`,
+      {}, // Corps vide
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur lors de la réactivation de l'utilisateur:", error);
+    return {
+      error: true,
+      message:
+        error.response?.data?.message ||
+        "Une erreur est survenue lors de la réactivation de l'utilisateur.",
+    };
+  }
+};
+export const createChercheurUser = async (userData) => {
+  try {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      return {
+        error: true,
+        message:
+          "Token d'authentification manquant. Veuillez vous reconnecter.",
+      };
+    }
+
+    const response = await api.post("accounts/admin/chercheurs/", userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return {
+      error: false,
+      data: response.data,
+      message:
+        "Compte chercheur créé avec succès. Un email a été envoyé à l'utilisateur avec ses identifiants.",
+    };
+  } catch (error) {
+    console.error("Erreur lors de la création du compte chercheur:", error);
+
+    return {
+      error: true,
+      status: error.response?.status,
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Une erreur est survenue lors de la création du compte chercheur.",
+    };
+  }
+};
 
 export default api;

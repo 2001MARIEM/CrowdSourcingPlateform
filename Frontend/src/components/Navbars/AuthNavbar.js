@@ -16,12 +16,12 @@ const AuthNavbar = () => {
     <>
       <Navbar className="navbar-top navbar-horizontal navbar-dark" expand="md">
         <Container className="px-4">
-          <NavbarBrand to="/" tag={Link}>
+          {/* <NavbarBrand to="/" tag={Link}>
             <img
               alt="..."
               src={require("../../assets/img/brand/argon-react-white.png")}
             />
-          </NavbarBrand>
+          </NavbarBrand> */}
           <button className="navbar-toggler" id="navbar-collapse-main">
             <span className="navbar-toggler-icon" />
           </button>
@@ -52,13 +52,13 @@ const AuthNavbar = () => {
                   tag={Link}
                 >
                   <i className="ni ni-circle-08" />
-                  <span className="nav-link-inner--text">Register</span>
+                  <span className="nav-link-inner--text">Inscription</span>
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink className="nav-link-icon" to="/auth/login" tag={Link}>
                   <i className="ni ni-key-25" />
-                  <span className="nav-link-inner--text">Login</span>
+                  <span className="nav-link-inner--text">Connexion</span>
                 </NavLink>
               </NavItem>
             </Nav>

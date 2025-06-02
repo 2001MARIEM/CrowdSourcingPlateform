@@ -1,43 +1,17 @@
 import { useEffect, useState } from "react";
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
-import axios from "axios";
 
 const Header = () => {
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    activeUsers: 0,
-    totalEvaluations: 0,
-    averagePerUser: 0,
+  // Statistiques statiques pour le développement
+  const [stats] = useState({
+    totalUsers: 42,
+    activeUsers: 28,
+    totalEvaluations: 156,
+    averagePerUser: 5.6,
   });
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        const res = await axios.get("http://localhost:8000/api/admin/stats/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = res.data;
-
-        setStats({
-          totalUsers: data.total_users,
-          activeUsers: data.active_users,
-          totalEvaluations: data.total_evaluations,
-          averagePerUser:
-            data.active_users > 0
-              ? (data.total_evaluations / data.active_users).toFixed(1)
-              : 0,
-        });
-      } catch (error) {
-        console.error("Erreur récupération stats admin :", error);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  // On supprime complètement le loading state puisqu'on n'a plus d'appel API
+  // On supprime aussi le useEffect avec l'appel fetchStats
 
   return (
     <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">

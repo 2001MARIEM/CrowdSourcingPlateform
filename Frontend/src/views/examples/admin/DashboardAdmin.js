@@ -1,7 +1,20 @@
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import Header from "components/Headers/Header.js";
+import { useNavigate } from "react-router-dom";
 
 const DashboardAdmin = () => {
+  const navigate = useNavigate();
+  
+  const handleSelectMode = (mode) => {
+    console.log("Mode choisi :", mode);
+     if (mode === "map") {
+      navigate("/admin/map");
+    } else if (mode === "users") {
+      navigate("/admin/users");
+    } else if (mode === "evaluations") {
+      navigate("/admin/evaluations");
+    }
+  };
   return (
     <>
       <Header />
@@ -77,9 +90,12 @@ const DashboardAdmin = () => {
                 <p className="card-text">
                   Visualiser la répartition des évaluations sur la carte.
                 </p>
-                <a href="/admin/map" className="btn btn-primary">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleSelectMode("map")}
+                >
                   Accéder
-                </a>
+                </button>
               </CardBody>
             </Card>
           </Col>

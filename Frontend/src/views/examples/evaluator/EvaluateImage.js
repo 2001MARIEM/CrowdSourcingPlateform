@@ -178,7 +178,7 @@ const EvaluateImage = () => {
                   ))}
 
                   <p className="mt-4 mb-2" maxLength={280}>
-                    <strong>Commentaires (optionnel)</strong>
+                    <strong>Commentaires  </strong>
                   </p>
                   <MDBTextArea
                       rows={3}

@@ -185,7 +185,7 @@ const EvaluateVideo = () => {
                   ))}
 
                   <p className="mt-4 mb-2">
-                    <strong>Commentaires (optionnel)</strong>
+                    <strong>Commentaires  </strong>
                   </p>
                   <MDBTextArea
                       rows={3}
