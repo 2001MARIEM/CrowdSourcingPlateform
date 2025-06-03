@@ -11,17 +11,13 @@ import {
   Col,
 } from "reactstrap";
 
-const AuthNavbar = () => {
-  
+const ResetNavbar = () => {
   return (
     <>
       <Navbar className="navbar-top navbar-horizontal navbar-dark" expand="md">
         <Container className="px-4">
           <NavbarBrand to="/" tag={Link}>
-            <img
-              alt="..."
-              src={require("../../assets/img/brand/1.png")}
-            />
+            <img alt="..." src={require("../../assets/img/brand/1.png")} />
           </NavbarBrand>
           <button className="navbar-toggler" id="navbar-collapse-main">
             <span className="navbar-toggler-icon" />
@@ -45,24 +41,7 @@ const AuthNavbar = () => {
                 </Col>
               </Row>
             </div>
-            <Nav className="ml-auto" navbar>
-              <NavItem>
-                <NavLink
-                  className="nav-link-icon"
-                  to="/auth/register"
-                  tag={Link}
-                >
-                  <i className="ni ni-circle-08" />
-                  <span className="nav-link-inner--text">Inscription</span>
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink className="nav-link-icon" to="/auth/login" tag={Link}>
-                  <i className="ni ni-key-25" />
-                  <span className="nav-link-inner--text">Connexion</span>
-                </NavLink>
-              </NavItem>
-            </Nav>
+             
           </UncontrolledCollapse>
         </Container>
       </Navbar>
@@ -70,4 +49,4 @@ const AuthNavbar = () => {
   );
 };
 
-export default AuthNavbar;
+export default ResetNavbar;

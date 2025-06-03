@@ -108,22 +108,7 @@ const DashboardAdmin = () => {
           </Col>
         </Row>
 
-        {/* Section future : aperçu dynamique */}
-        <Row className="mt-5">
-          <Col xl="12">
-            <Card className="shadow">
-              <CardHeader>
-                <h3 className="mb-0">Statistiques dynamiques (à venir)</h3>
-              </CardHeader>
-              <CardBody>
-                <p>
-                  Graphiques, dernières évaluations, logs récents... à intégrer
-                  ici plus tard.
-                </p>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+        
       </Container>
     </>
   );

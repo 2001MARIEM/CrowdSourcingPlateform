@@ -15,6 +15,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Profile from "views/examples/evaluator/Profile";
 import MapPage from "views/examples/admin/MapPage";
 import UserManagement from "views/examples/admin/UserManagement";
+import ResetPassword from "views/examples/ResetPassword";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -42,9 +43,9 @@ root.render(
           <Route path="" element={<Navigate to="evaluations" replace />} />
         </Route>
 
- 
         {/* Auth routes */}
         <Route path="/auth/*" element={<AuthLayout />} />
+        <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
 
         {/* Default redirect */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />

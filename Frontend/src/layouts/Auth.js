@@ -1,20 +1,4 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
+ 
 import React from "react";
 import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
@@ -31,9 +15,9 @@ const Auth = (props) => {
   const location = useLocation();
 
   React.useEffect(() => {
-    document.body.classList.add("bg-default");
+    document.body.classList.add("bg-dark");
     return () => {
-      document.body.classList.remove("bg-default");
+      document.body.classList.remove("bg-dark");
     };
   }, []);
   React.useEffect(() => {
@@ -58,48 +42,33 @@ const Auth = (props) => {
     <>
       <div className="main-content" ref={mainContent}>
         <AuthNavbar />
-        <div className="header bg-gradient-info py-7 py-lg-8">
+        <div className="header bg-dark py-7 py-lg-8">
           <Container>
             <div className="header-body text-center mb-7">
               <Row className="justify-content-center">
                 <Col lg="5" md="6">
                   <h1 className="text-white">Bienvenue!</h1>
                   <p className="text-lead text-light">
-                    Utilisez ces formulaires  pour vous
-                    connecter ou créer un nouveau compte dans 
-                    projet .
+                    Utilisez ces formulaires pour vous connecter ou créer un
+                    nouveau compte dans projet .
                   </p>
                 </Col>
               </Row>
             </div>
           </Container>
-          <div className="separator separator-bottom separator-skew zindex-100">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="none"
-              version="1.1"
-              viewBox="0 0 2560 100"
-              x="0"
-              y="0"
-            >
-              <polygon
-                className="fill-default"
-                points="2560 0 2560 100 0 100"
-              />
-            </svg>
-          </div>
+           
         </div>
         {/* Page content */}
         <Container className="mt--8 pb-5">
           <Row className="justify-content-center">
             <Routes>
               {getRoutes(routes)}
-              <Route path="*" element={<Navigate to="/auth/login" replace />} />
+              <Route path="*" element={<Navigate to="/auth/*" replace />} />
             </Routes>
           </Row>
         </Container>
       </div>
-      <AuthFooter />
+       
     </>
   );
 };

@@ -591,5 +591,40 @@ export const getStats = async () => {
     }
   }
 };
+// Demande de réinitialisation de mot de passe
+export const forgotPassword = async (email) => {
+  try {
+    const response = await api.post("/accounts/forgot-password/", { email });
+    return { 
+      data: response.data, 
+      error: false 
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: true,
+      message: error.response?.data?.detail || "Erreur lors de l'envoi de l'email",
+      status: error.response?.status
+    };
+  }
+};
+
+// Réinitialisation du mot de passe
+export const resetPassword = async (token, password) => {
+  try {
+    const response = await api.post(`/accounts/reset-password/${token}/`, { password });
+    return { 
+      data: response.data, 
+      error: false 
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: true,
+      message: error.response?.data?.password || error.response?.data?.detail || "Erreur lors de la réinitialisation",
+      status: error.response?.status
+    };
+  }
+};
 
 export default api;
