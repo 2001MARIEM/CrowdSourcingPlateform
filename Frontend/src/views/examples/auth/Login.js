@@ -17,11 +17,14 @@ import {
   ModalBody,
   ModalFooter,
 } from "reactstrap";
-
+import { forgotPassword } from "services/api";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, loading } = useAuth();
+  const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   // État pour l'alert dialog
   const [alertDialog, setAlertDialog] = useState({
@@ -116,7 +119,42 @@ const Login = () => {
       showAlertDialog("error", "Erreur de connexion", errorMessage);
     }
   };
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
 
+    if (!forgotEmail) {
+      showAlertDialog(
+        "warning",
+        "Email requis",
+        "Veuillez saisir votre adresse email."
+      );
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      const result = await forgotPassword(forgotEmail);
+
+      if (result.error) {
+        showAlertDialog("error", "Erreur", result.message);
+      } else {
+        showAlertDialog(
+          "success",
+          "Email envoyé !",
+          "Un lien de réinitialisation a été envoyé à votre adresse email.",
+          () => {
+            setForgotPasswordModal(false);
+            setForgotEmail("");
+          }
+        );
+      }
+    } catch (error) {
+      showAlertDialog("error", "Erreur", "Une erreur s'est produite.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
   return (
     <>
       <Col lg="5" md="7">
@@ -180,10 +218,83 @@ const Login = () => {
                   )}
                 </Button>
               </div>
+              {/* Ajoutez ce lien */}
+              <div className="text-center">
+                <Button
+                  color="link"
+                  size="sm"
+                  onClick={() => setForgotPasswordModal(true)}
+                  className="text-muted"
+                >
+                  Mot de passe oublié ?
+                </Button>
+              </div>
             </Form>
           </CardBody>
         </Card>
       </Col>
+      {/* Modal Mot de passe oublié */}
+      <Modal
+        isOpen={forgotPasswordModal}
+        toggle={() => setForgotPasswordModal(false)}
+        centered
+        backdrop="static"
+      >
+        <ModalHeader toggle={() => setForgotPasswordModal(false)}>
+          <i className="fas fa-key mr-2 text-primary"></i>
+          Mot de passe oublié
+        </ModalHeader>
+
+        <Form onSubmit={handleForgotPassword}>
+          <ModalBody>
+            <p className="text-muted">
+              Saisissez votre adresse email pour recevoir un lien de
+              réinitialisation.
+            </p>
+
+            <FormGroup>
+              <InputGroup className="input-group-alternative">
+                <InputGroupAddon addonType="prepend">
+                  <InputGroupText>
+                    <i className="ni ni-email-83" />
+                  </InputGroupText>
+                </InputGroupAddon>
+                <Input
+                  placeholder="Votre adresse email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  required
+                />
+              </InputGroup>
+            </FormGroup>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              color="secondary"
+              onClick={() => {
+                setForgotPasswordModal(false);
+                setForgotEmail("");
+              }}
+              disabled={forgotLoading}
+            >
+              <i className="fas fa-times mr-2"></i>
+              Annuler
+            </Button>
+            <Button color="primary" type="submit" disabled={forgotLoading}>
+              <i
+                className={
+                  forgotLoading
+                    ? "fas fa-spinner fa-spin mr-2"
+                    : "fas fa-paper-plane mr-2"
+                }
+              ></i>
+              {forgotLoading ? "Envoi..." : "Envoyer"}
+            </Button>
+          </ModalFooter>
+        </Form>
+      </Modal>
 
       {/* Alert Dialog Modal */}
       <Modal

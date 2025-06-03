@@ -16,6 +16,9 @@ const AdminNavbar = () => {
   const handleLogout = () => {
     logout();
   };
+  console.log("🔍 User dans navbar:", user);
+  console.log("🔍 Prenom:", user?.prenom);
+  console.log("🔍 Nom:", user?.nom);
   return (
     <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
       <Container fluid className="justify-content-end">
@@ -26,7 +29,7 @@ const AdminNavbar = () => {
                 <span className="avatar avatar-sm rounded-circle">
                   <img
                     alt="..."
-                    src={require("../../assets/img/theme/team-4-800x800.jpg")}
+                    src={require("../../assets/img/theme/admin.png")}
                   />
                 </span>
                 <div className="ml-2 d-lg-block">

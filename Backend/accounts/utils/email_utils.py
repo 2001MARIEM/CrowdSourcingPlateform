@@ -92,7 +92,7 @@ def generate_password_reset_token(user):
 
 def send_password_reset_email(user):
     token = generate_password_reset_token(user)
-    reset_url = f"http://localhost:8000/reset-password/{token}/"
+    reset_url = f"http://localhost:3000/auth/reset-password/{user.reset_token}"  # ← Frontend React !
 
     subject = "Réinitialisation de mot de passe - CrowdSourcingPlatform"
     message = (

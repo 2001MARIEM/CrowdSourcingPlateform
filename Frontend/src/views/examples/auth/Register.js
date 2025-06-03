@@ -268,7 +268,7 @@ const Register = () => {
                   />
                 </InputGroup>
               </FormGroup>
-              <FormGroup>
+               <FormGroup>
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
                     <InputGroupText>
@@ -276,13 +276,59 @@ const Register = () => {
                     </InputGroupText>
                   </InputGroupAddon>
                   <Input
-                    placeholder="Secteur d'activité"
-                    type="text"
+                    type="select"
                     name="secteur_activite"
                     value={formData.secteur_activite}
                     onChange={handleChange}
                     required
-                  />
+                    className="form-control-alternative"
+                  >
+                    <option value="">
+                      Sélectionnez votre secteur d'activité
+                    </option>
+                    <option value="Informatique/Technologies">
+                      Informatique/Technologies
+                    </option>
+                    <option value="Santé/Médical">Santé/Médical</option>
+                    <option value="Éducation/Formation">
+                      Éducation/Formation
+                    </option>
+                    <option value="Finance/Banque">Finance/Banque</option>
+                    <option value="Commerce/Retail">Commerce/Retail</option>
+                    <option value="Industrie/Manufacturing">
+                      Industrie/Manufacturing
+                    </option>
+                    <option value="Transport/Logistique">
+                      Transport/Logistique
+                    </option>
+                    <option value="Immobilier">Immobilier</option>
+                    <option value="Tourisme/Hôtellerie">
+                      Tourisme/Hôtellerie
+                    </option>
+                     
+                    <option value="Construction/BTP">Construction/BTP</option>
+                    <option value="Média/Communication">
+                      Média/Communication
+                    </option>
+                    <option value="Juridique/Droit">Juridique/Droit</option>
+                    <option value="Consulting/Conseil">
+                      Consulting/Conseil
+                    </option>
+                    <option value="Énergie/Environnement">
+                      Énergie/Environnement
+                    </option>
+                    <option value="Automobile">Automobile</option>
+                     
+                    <option value="Arts/Culture/Divertissement">
+                      Arts/Culture/Divertissement
+                    </option>
+                     
+                    <option value="Recherche/Sciences">
+                      Recherche/Sciences
+                    </option>
+                    <option value="Services publics">Services publics</option>
+                    <option value="Autre">Autre</option>
+                  </Input>
                 </InputGroup>
               </FormGroup>
               <div className="text-center">
