@@ -1,6 +1,6 @@
 import DashboardAdmin from "views/examples/admin/DashboardAdmin.js";
 import UserManagement from "views/examples/admin/UserManagement.js";
-import MediaManagement from "views/examples/admin/MediaManagement.js";
+import ConsultEvaluation from "views/examples/admin/ConsultEvaluation.js";
 import MapPage from "views/examples/admin/MapPage.js";
 
 import DashboardEvaluator from "views/examples/evaluator/DashboardEvaluator.js";
@@ -28,7 +28,14 @@ var routes = [
     component: <UserManagement />,
     layout: "/admin",
   },
-   
+  {
+    path: "/user-evaluation",
+    name: "Consulter évaluations",
+    icon: "ni ni-chart-bar-32 text-green",
+    component: <ConsultEvaluation />,
+    layout: "/admin",
+  },
+
   {
     path: "/map",
     name: "Carte des évaluations",
@@ -45,9 +52,7 @@ var routes = [
     component: <DashboardEvaluator />,
     layout: "/evaluator",
   },
-   
 
-   
   {
     path: "/history",
     name: "Historique",

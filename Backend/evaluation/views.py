@@ -168,8 +168,10 @@ class ListEvaluationsView(APIView):
     
 #generation des cartes d'ambiances    
 
+ 
+
 class CompositeMapView(APIView):
-    permission_classes = [IsAdminUser]  # ou autre selon ton cas
+    permission_classes = [IsAdminUser]  # ou adapte selon ton besoin
 
     def get(self, request, year):
         try:
@@ -183,6 +185,7 @@ class CompositeMapView(APIView):
             return Response({"message": "Aucune donnée disponible."}, status=404)
 
         square_scores = defaultdict(list)
+        square_data = defaultdict(list)
 
         for eval in evaluations:
             if eval.media and eval.media.year == year:
@@ -197,6 +200,25 @@ class CompositeMapView(APIView):
                 square_index = eval.media.square_index
                 square_scores[square_index].append(score)
 
+                eval_info = {
+                    "evaluator_email": eval.evaluator.email if eval.evaluator else None,
+                    "beauty": eval.beauty,
+                    "boring": eval.boring,
+                    "depressing": eval.depressing,
+                    "lively": eval.lively,
+                    "wealthy": eval.wealthy,
+                    "safe": eval.safe,
+                    "comment": eval.comment,
+                    "created_at": eval.created_at,
+                    "media_info": {
+                        "year": eval.media.year,
+                        "place": eval.media.place,
+                        "type": eval.media.media_type,
+                        "url": eval.media.url
+                    }
+                }
+                square_data[square_index].append(eval_info)
+
         if not square_scores:
             return Response({"message": f"Aucune donnée pour l'année {year}."}, status=404)
 
@@ -208,7 +230,10 @@ class CompositeMapView(APIView):
             result.append({
                 "square_index": square_index,
                 "score": round(avg_score, 2),
-                "coords": media_sample.coords if media_sample else None
+                "coords": media_sample.coords if media_sample else None,
+                "evaluations": square_data[square_index]
             })
 
         return Response({str(year): result})
+    
+

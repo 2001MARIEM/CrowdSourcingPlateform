@@ -1,7 +1,21 @@
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import Header from "components/Headers/Header.js";
+import { useNavigate } from "react-router-dom";
 
 const DashboardAdmin = () => {
+  const navigate = useNavigate();
+
+  const handleSelectMode = (mode) => {
+    console.log("Mode choisi :", mode);
+    if (mode === "map") {
+      navigate("/admin/map");
+    } else if (mode === "users") {
+      navigate("/admin/user-evaluation");
+    } else if (mode === "user-evaluation") {
+      navigate("/admin/user-evaluation");
+    }
+  };
+
   return (
     <>
       <Header />
@@ -23,7 +37,7 @@ const DashboardAdmin = () => {
                   <p>
                     Utilisez les raccourcis ci-dessous pour gérer les
                     utilisateurs, visualiser les évaluations et accéder à la
-                    carte d’analyse.
+                    carte d'analyse.
                   </p>
                 </div>
               </CardBody>
@@ -43,9 +57,12 @@ const DashboardAdmin = () => {
                 <p className="card-text">
                   Activer/désactiver les comptes utilisateurs.
                 </p>
-                <a href="/admin/users" className="btn btn-primary">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleSelectMode("users")}
+                >
                   Accéder
-                </a>
+                </button>
               </CardBody>
             </Card>
           </Col>
@@ -60,9 +77,12 @@ const DashboardAdmin = () => {
                 <p className="card-text">
                   Consulter toutes les évaluations soumises.
                 </p>
-                <a href="/admin/evaluations" className="btn btn-primary">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleSelectMode("user-evaluation")}
+                >
                   Accéder
-                </a>
+                </button>
               </CardBody>
             </Card>
           </Col>
@@ -73,13 +93,16 @@ const DashboardAdmin = () => {
                 <div className="icon icon-shape bg-gradient-info text-white rounded-circle mb-3">
                   <i className="fas fa-map-marked-alt fa-2x" />
                 </div>
-                <h5 className="card-title">Carte d’évaluation</h5>
+                <h5 className="card-title">Carte d'évaluation</h5>
                 <p className="card-text">
                   Visualiser la répartition des évaluations sur la carte.
                 </p>
-                <a href="/admin/map" className="btn btn-primary">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleSelectMode("map")}
+                >
                   Accéder
-                </a>
+                </button>
               </CardBody>
             </Card>
           </Col>

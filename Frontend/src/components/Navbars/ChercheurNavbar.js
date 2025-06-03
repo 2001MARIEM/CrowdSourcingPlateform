@@ -11,17 +11,12 @@ import {
   Media,
 } from "reactstrap";
 
-const EvaluatorNavbar = () => {
-  const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-  };
-
+const ChercheurNavbar = () => {
+  const { user,logout } = useAuth();
   return (
     <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
-      <Container fluid>
-        <Nav className="align-items-center ml-auto" navbar>
+      <Container fluid className="justify-content-end">
+        <Nav className="align-items-center" navbar>
           <UncontrolledDropdown nav>
             <DropdownToggle className="pr-0" nav>
               <Media className="align-items-center">
@@ -38,14 +33,20 @@ const EvaluatorNavbar = () => {
                 </Media>
               </Media>
             </DropdownToggle>
+
             <DropdownMenu className="dropdown-menu-arrow" right>
-              <DropdownItem to="/evaluator/profile" tag={Link}>
+              <DropdownItem className="noti-title" header tag="div">
+                <h6 className="text-overflow m-0">Bienvenue !</h6>
+              </DropdownItem>
+
+              <DropdownItem to="/chercheur/profile" tag={Link}>
                 <i className="ni ni-single-02" />
                 <span>Mon profil</span>
               </DropdownItem>
-               
+
               <DropdownItem divider />
-              <DropdownItem onClick={handleLogout}>
+
+              <DropdownItem onClick={logout}>
                 <i className="ni ni-user-run" />
                 <span>Déconnexion</span>
               </DropdownItem>
@@ -57,4 +58,4 @@ const EvaluatorNavbar = () => {
   );
 };
 
-export default EvaluatorNavbar;
+export default ChercheurNavbar;

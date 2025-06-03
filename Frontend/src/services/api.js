@@ -12,55 +12,79 @@ const api = axios.create({
 export const registerUser = async (userData) => {
   try {
     const response = await api.post("/accounts/register/", userData);
-    return response.data;
+    return { 
+      data: response.data, 
+      error: false 
+    };
   } catch (error) {
     console.error("Erreur lors de l'enregistrement:", error);
-    throw error; // Lancer l'erreur pour la gestion côté appelant
+    return {
+      data: null,
+      error: true,
+      message: error.response?.data || error.message,
+      status: error.response?.status
+    };
   }
 };
-
 // Connexion utilisateur ou admin
 export const loginUser = async (email, password) => {
   try {
-    // Envoi de la requête POST pour se connecter
     const response = await api.post("/accounts/login/", {
       email,
       password,
     });
 
-    // Vérification de la réponse
     const { access, refresh, userRole } = response.data;
-    console.log("Réponse de l'API : ", response.data); // Ajout de log pour la réponse
+    console.log("Réponse de l'API : ", response.data);
 
-    // Vérifier si la réponse contient les données nécessaires
     if (!access || !refresh || !userRole) {
-      throw new Error("Réponse invalide, informations utilisateur manquantes.");
+      return {
+        data: null,
+        error: true,
+        message: "Réponse invalide, informations utilisateur manquantes.",
+      };
     }
-    // Stockage des tokens dans localStorage
-    localStorage.setItem("accessToken", access);
-    localStorage.setItem("refreshToken", refresh);
-    localStorage.setItem("userRole", userRole); // Op
 
-    // Renvoie un objet avec les informations pertinentes : tokens + rôle utilisateur
     return {
-      access,
-      refresh,
-      userRole,
+      data: { access, refresh, userRole },
+      error: false,
     };
-  } catch (error) {
+  }  catch (error) {
     console.error("Erreur lors de la connexion:", error);
-    // Gérer les erreurs de manière propre avec un message d'erreur clair
-    throw new Error(
-      error.response
-        ? error.response.data.error
-        : "Échec de la connexion, veuillez vérifier vos identifiants."
-    );
+    
+    let errorMessage = "Email ou mot de passe incorrect.";
+    
+    if (error.response?.data) {
+      const errorData = error.response.data;
+      
+      // Gestion des erreurs Django (non_field_errors)
+      if (errorData.non_field_errors && Array.isArray(errorData.non_field_errors)) {
+        errorMessage = errorData.non_field_errors[0];
+      }
+      // Gestion des autres formats d'erreur
+      else if (errorData.error) {
+        errorMessage = errorData.error;
+      }
+      else if (errorData.message) {
+        errorMessage = errorData.message;
+      }
+      else if (errorData.detail) {
+        errorMessage = errorData.detail;
+      }
+    }
+    
+    return {
+      data: null,
+      error: true,
+      message: errorMessage,
+      status: error.response?.status
+    };
   }
 };
 
 
 // Récupération du profil utilisateur
-export const getUserProfile = async (accessToken) => {
+export const getProfile = async (accessToken) => {
   try {
     const response = await api.get("/accounts/me/", {
       headers: {
@@ -328,7 +352,244 @@ export const updateEvaluation = async (evaluationId, ratings, comment) => {
     };
   }
 };
- 
+// Dans api.js
+export const fetchMapDataByYear = async (year) => {
+  try {
+    // Récupérer le token depuis le localStorage
+    const token = localStorage.getItem("access_token");
+    
+    // Vérifier si le token existe
+    if (!token) {
+      throw new Error("Token d'authentification manquant");
+    }
+    
+    // Envoyer la requête avec le token dans l'en-tête Authorization
+    const response = await axios.get(`http://127.0.0.1:8000/api/evaluation/map/composite/${year}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données de carte:", error);
+    throw error;
+  }
+};
+// Fonction pour récupérer les évaluations admin
+export const getAdminEvaluations = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/evaluation/view_evaluations_admin/?download=false`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur récupération évaluations admin:", error);
+    return { 
+      error: true, 
+      message: error.response?.data || error.message,
+      status: error.response?.status 
+    };
+  }
+};
 
+// Fonction pour télécharger les évaluations au format JSON
+export const downloadAdminEvaluations = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/evaluation/view_evaluations_admin/?download=true`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob", // Important pour télécharger le fichier
+      }
+    );
+    
+    // Créer un blob et télécharger le fichier
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'evaluations.json');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    return { error: false };
+  } catch (error) {
+    console.error("Erreur téléchargement évaluations:", error);
+    return { 
+      error: true, 
+      message: error.response?.data || error.message,
+      status: error.response?.status 
+    };
+  }
+};
+export const getEvaluatorsList = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await api.get(
+      `http://127.0.0.1:8000/api/accounts/admin/evaluateurs/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur lors de la récupération des évaluateurs:", error);
+    return {
+      error: true,
+      message:
+        error.response?.data?.message ||
+        "Une erreur est survenue lors de la récupération des évaluateurs.",
+    };
+  }
+};
+export const DisableUser = async (userId) => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await api.post(
+      `/accounts/admin/desactiver/${userId}/`,
+      {}, // Le deuxième paramètre est le corps de la requête (même vide)
+      {
+        headers: {
+          // Le troisième paramètre est pour les options, y compris les headers
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur lors de la désactivation de l'utilisateur:", error);
+    return {
+      error: true,
+      message:
+        error.response?.data?.message ||
+        "Une erreur est survenue lors de la désactivation de l'utilisateur.",
+    };
+  }
+};
+
+export const ActivateUser = async (userId) => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const response = await api.post(
+      `/accounts/admin/reactiver/${userId}/`,
+      {}, // Corps vide
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { error: false, data: response.data };
+  } catch (error) {
+    console.error("Erreur lors de la réactivation de l'utilisateur:", error);
+    return {
+      error: true,
+      message:
+        error.response?.data?.message ||
+        "Une erreur est survenue lors de la réactivation de l'utilisateur.",
+    };
+  }
+};
+export const createChercheurUser = async (userData) => {
+  try {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      return {
+        error: true,
+        message:
+          "Token d'authentification manquant. Veuillez vous reconnecter.",
+      };
+    }
+
+    const response = await api.post("accounts/admin/chercheurs/", userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return {
+      error: false,
+      data: response.data,
+      message:
+        "Compte chercheur créé avec succès. Un email a été envoyé à l'utilisateur avec ses identifiants.",
+    };
+  } catch (error) {
+    console.error("Erreur lors de la création du compte chercheur:", error);
+
+    return {
+      error: true,
+      status: error.response?.status,
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Une erreur est survenue lors de la création du compte chercheur.",
+    };
+  }
+};
+export const getStats = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      return {
+        error: true,
+        message:
+          "Token d'authentification manquant. Veuillez vous reconnecter.",
+      };
+    }
+
+    const response = await api.get(
+      "http://127.0.0.1:8000/api/accounts/admin/stats/",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+     
+    return {
+      data: response.data,
+      error: false,
+    };
+  } catch (error) {
+    console.error("Erreur API:", error);
+
+    // Gestion des erreurs HTTP avec axios
+    if (error.response) {
+      return {
+        data: null,
+        error: true,
+        message:
+          error.response.data?.message || `Erreur ${error.response.status}`,
+      };
+    } else {
+      return {
+        data: null,
+        error: true,
+        message: "Erreur de connexion",
+      };
+    }
+  }
+};
 
 export default api;
