@@ -12,6 +12,7 @@ import {
 } from "reactstrap";
 
 const AuthNavbar = () => {
+  
   return (
     <>
       <Navbar className="navbar-top navbar-horizontal navbar-dark" expand="md">

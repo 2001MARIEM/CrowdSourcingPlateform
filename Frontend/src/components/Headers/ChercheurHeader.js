@@ -1,88 +1,53 @@
 import { useEffect, useState } from "react";
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
-import { getStats } from "services/api"; 
+import { getAdminEvaluations } from "services/api";
 
-const Header = () => {
-   const [stats, setStats] = useState({
-    total_users: 0,
-    active_users: 0,
-    total_evaluations: 0,
-    chercheurs_count: 0,
+const ChercheurHeader = () => {
+  const [stats, setStats] = useState({
+    totalEvaluations: 0,
+    totalImages: 0,
+    totalVideos: 0,
   });
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const loadStats = async () => {
-      const result = await getStats();
-      console.log("📊 Résultat complet:", result);
-      if (!result.error) {
-        console.log("✅ Données reçues:", result.data);
-        console.log("🔍 Type de result.data:", typeof result.data);
-        console.log("🔍 Clés disponibles:", Object.keys(result.data));
-        setStats(result.data);
-        console.log("💾 Stats après setStats:", result.data);
+      try {
+        const result = await getAdminEvaluations(); // Même API que l'admin
+        if (!result.error) {
+          const evaluations = result.data;
+
+          // Calculer les statistiques
+          const totalEvaluations = evaluations.length;
+          const totalImages = evaluations.filter(
+            (e) => e.media_info?.type === "image"
+          ).length;
+          const totalVideos = evaluations.filter(
+            (e) => e.media_info?.type === "video"
+          ).length;
+
+          setStats({
+            totalEvaluations,
+            totalImages,
+            totalVideos,
+          });
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des statistiques:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadStats();
   }, []);
-  
+
   return (
-    <div className="header bg-gradient-dark pb-8 pt-5 pt-md-8">
+    <div className="header bg-gradient-success pb-8 pt-5 pt-md-8">
       <Container fluid>
         <div className="header-body">
           <Row>
-            <Col lg="6" xl="3">
-              <Card className="card-stats mb-4 mb-xl-0">
-                <CardBody>
-                  <Row>
-                    <div className="col">
-                      <CardTitle
-                        tag="h5"
-                        className="text-uppercase text-muted mb-0"
-                      >
-                        Utilisateurs inscrits
-                      </CardTitle>
-                      <span className="h2 font-weight-bold mb-0">
-                        {loading ? "..." : stats.total_users}
-                      </span>
-                    </div>
-                    <Col className="col-auto">
-                      <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                        <i className="fas fa-users" />
-                      </div>
-                    </Col>
-                  </Row>
-                </CardBody>
-              </Card>
-            </Col>
-
-            <Col lg="6" xl="3">
-              <Card className="card-stats mb-4 mb-xl-0">
-                <CardBody>
-                  <Row>
-                    <div className="col">
-                      <CardTitle
-                        tag="h5"
-                        className="text-uppercase text-muted mb-0"
-                      >
-                        Utilisateurs actifs
-                      </CardTitle>
-                      <span className="h2 font-weight-bold mb-0">
-                        {loading ? "..." : stats.active_users}
-                      </span>
-                    </div>
-                    <Col className="col-auto">
-                      <div className="icon icon-shape bg-success text-white rounded-circle shadow">
-                        <i className="fas fa-user-check" />
-                      </div>
-                    </Col>
-                  </Row>
-                </CardBody>
-              </Card>
-            </Col>
-
-            <Col lg="6" xl="3">
+            <Col lg="6" xl="4">
               <Card className="card-stats mb-4 mb-xl-0">
                 <CardBody>
                   <Row>
@@ -94,7 +59,7 @@ const Header = () => {
                         Évaluations totales
                       </CardTitle>
                       <span className="h2 font-weight-bold mb-0">
-                        {loading ? "..." : stats.total_evaluations}
+                        {loading ? "..." : stats.totalEvaluations}
                       </span>
                     </div>
                     <Col className="col-auto">
@@ -107,7 +72,7 @@ const Header = () => {
               </Card>
             </Col>
 
-            <Col lg="6" xl="3">
+            <Col lg="6" xl="4">
               <Card className="card-stats mb-4 mb-xl-0">
                 <CardBody>
                   <Row>
@@ -116,15 +81,40 @@ const Header = () => {
                         tag="h5"
                         className="text-uppercase text-muted mb-0"
                       >
-                        Nombre de chercheurs
+                        Images évaluées
                       </CardTitle>
                       <span className="h2 font-weight-bold mb-0">
-                        {loading ? "..." : stats.chercheurs_count}
+                        {loading ? "..." : stats.totalImages}
+                      </span>
+                    </div>
+                    <Col className="col-auto">
+                      <div className="icon icon-shape bg-primary text-white rounded-circle shadow">
+                        <i className="fas fa-image" />
+                      </div>
+                    </Col>
+                  </Row>
+                </CardBody>
+              </Card>
+            </Col>
+
+            <Col lg="6" xl="4">
+              <Card className="card-stats mb-4 mb-xl-0">
+                <CardBody>
+                  <Row>
+                    <div className="col">
+                      <CardTitle
+                        tag="h5"
+                        className="text-uppercase text-muted mb-0"
+                      >
+                        Vidéos évaluées
+                      </CardTitle>
+                      <span className="h2 font-weight-bold mb-0">
+                        {loading ? "..." : stats.totalVideos}
                       </span>
                     </div>
                     <Col className="col-auto">
                       <div className="icon icon-shape bg-info text-white rounded-circle shadow">
-                        <i className="fas fa-user-graduate" />{" "}
+                        <i className="fas fa-video" />
                       </div>
                     </Col>
                   </Row>
@@ -138,4 +128,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default ChercheurHeader;

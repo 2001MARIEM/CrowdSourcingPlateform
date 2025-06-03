@@ -31,7 +31,7 @@ var routes = [
   {
     path: "/user-evaluation",
     name: "Consulter évaluations",
-    icon: "ni ni-single-02 text-blue",
+    icon: "ni ni-chart-bar-32 text-green",
     component: <ConsultEvaluation />,
     layout: "/admin",
   },

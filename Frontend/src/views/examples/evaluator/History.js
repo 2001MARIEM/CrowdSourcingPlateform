@@ -9,11 +9,21 @@ import {
   MDBCardFooter,
   MDBTextArea,
 } from "mdb-react-ui-kit";
-import { Container, Row, Col, Button, ButtonGroup } from "reactstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  ButtonGroup,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "reactstrap";
 import EvaluatorHeader from "components/Headers/EvaluatorHeader";
 import { getUserEvaluationHistory, updateEvaluation } from "services/api";
 
-// Liste des critères d’évaluation
+// Liste des critères d'évaluation
 const evaluationCriteria = [
   { label: "Beauté", key: "beauty" },
   { label: "Ennui", key: "boring" },
@@ -37,13 +47,81 @@ const History = () => {
   const [reload, setReload] = useState(false);
   const [filter, setFilter] = useState("all"); // "all", "image", "video"
 
+  // État pour l'alert dialog
+  const [alertDialog, setAlertDialog] = useState({
+    isOpen: false,
+    type: "success", // 'success', 'error', 'warning'
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  // Fonction pour afficher l'alert dialog
+  const showAlertDialog = (type, title, message, onConfirm = null) => {
+    setAlertDialog({
+      isOpen: true,
+      type: type,
+      title: title,
+      message: message,
+      onConfirm: onConfirm,
+    });
+  };
+
+  // Fermer l'alert dialog
+  const closeAlertDialog = () => {
+    if (alertDialog.onConfirm) {
+      alertDialog.onConfirm();
+    }
+    setAlertDialog({
+      isOpen: false,
+      type: "success",
+      title: "",
+      message: "",
+      onConfirm: null,
+    });
+  };
+
+  // Icônes et couleurs selon le type d'alerte
+  const getAlertIcon = (type) => {
+    switch (type) {
+      case "success":
+        return <i className="fas fa-check-circle fa-3x text-success mb-3"></i>;
+      case "error":
+        return <i className="fas fa-times-circle fa-3x text-danger mb-3"></i>;
+      case "warning":
+        return (
+          <i className="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+        );
+      default:
+        return <i className="fas fa-info-circle fa-3x text-info mb-3"></i>;
+    }
+  };
+
+  const getButtonColor = (type) => {
+    switch (type) {
+      case "success":
+        return "success";
+      case "error":
+        return "danger";
+      case "warning":
+        return "warning";
+      default:
+        return "primary";
+    }
+  };
+
   useEffect(() => {
     const loadHistory = async () => {
       const result = await getUserEvaluationHistory();
       if (!result.error) {
         setEvaluations(result.data);
       } else {
-        alert("Erreur : " + result.message.message);
+        showAlertDialog(
+          "error",
+          "Erreur de chargement",
+          "Une erreur s'est produite lors du chargement de l'historique : " +
+            result.message.message
+        );
       }
     };
     loadHistory();
@@ -62,6 +140,12 @@ const History = () => {
     setComment(evalItem.comment || "");
   };
 
+  const handleCancelEdit = () => {
+    setActiveEditId(null);
+    setRatings({});
+    setComment("");
+  };
+
   const handleStarClick = (key, value) => {
     setRatings({ ...ratings, [key]: value });
   };
@@ -69,15 +153,23 @@ const History = () => {
   const handleSubmitUpdate = async (evaluationId) => {
     const result = await updateEvaluation(evaluationId, ratings, comment);
     if (!result.error) {
-      alert("Évaluation modifiée !");
-      setActiveEditId(null);
-      setReload(!reload);
-    } else {
-      alert(
-        result.status === 403
-          ? "Modification non autorisée (évaluation trop ancienne)."
-          : "Erreur : " + result.message.message
+      showAlertDialog(
+        "success",
+        "Modification réussie !",
+        "Votre évaluation a été modifiée avec succès.",
+        () => {
+          setActiveEditId(null);
+          setReload(!reload);
+        }
       );
+    } else {
+      const errorMessage =
+        result.status === 403
+          ? "Modification non autorisée. Les évaluations ne peuvent être modifiées que dans les 24h suivant leur création."
+          : "Une erreur s'est produite lors de la modification : " +
+            result.message.message;
+
+      showAlertDialog("error", "Erreur de modification", errorMessage);
     }
   };
 
@@ -212,12 +304,20 @@ const History = () => {
 
                     <MDBCardFooter className="text-end">
                       {activeEditId === evalItem.id ? (
-                        <Button
-                          color="success"
-                          onClick={() => handleSubmitUpdate(evalItem.id)}
-                        >
-                          Sauvegarder
-                        </Button>
+                        <>
+                          <Button
+                            color="success"
+                            onClick={() => handleSubmitUpdate(evalItem.id)}
+                            className="me-2"
+                          >
+                            <i className="fas fa-check mr-2"></i>
+                            Sauvegarder
+                          </Button>
+                          <Button color="secondary" onClick={handleCancelEdit}>
+                            <i className="fas fa-times mr-2"></i>
+                            Annuler
+                          </Button>
+                        </>
                       ) : (
                         new Date() - new Date(evalItem.created_at) <
                           24 * 60 * 60 * 1000 && (
@@ -225,6 +325,7 @@ const History = () => {
                             color="primary"
                             onClick={() => handleEditClick(evalItem)}
                           >
+                            <i className="fas fa-edit mr-2"></i>
                             Modifier
                           </Button>
                         )
@@ -237,6 +338,34 @@ const History = () => {
           </Col>
         </Row>
       </Container>
+
+      {/* Alert Dialog Modal */}
+      <Modal
+        isOpen={alertDialog.isOpen}
+        centered
+        backdrop="static"
+        keyboard={false}
+        size="sm"
+      >
+        <ModalHeader className="border-0 pb-0">
+          <div className="text-center w-100">
+            {getAlertIcon(alertDialog.type)}
+          </div>
+        </ModalHeader>
+        <ModalBody className="text-center pt-0">
+          <h5 className="mb-3">{alertDialog.title}</h5>
+          <p className="text-muted mb-0">{alertDialog.message}</p>
+        </ModalBody>
+        <ModalFooter className="border-0 justify-content-center">
+          <Button
+            color={getButtonColor(alertDialog.type)}
+            onClick={closeAlertDialog}
+            className="px-4"
+          >
+            OK
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };

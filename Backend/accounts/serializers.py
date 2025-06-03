@@ -108,6 +108,7 @@ class UserProfileSerializer(serializers.Serializer):
     secteur_activite = serializers.CharField(max_length=100, required=False)
     date_joined = serializers.DateTimeField(read_only=True)
     is_active = serializers.BooleanField(read_only=True)  # Ajout utile pour le frontend
+    is_chercheur = serializers.BooleanField(read_only=True)
 
     def update(self, instance, validated_data):
         """

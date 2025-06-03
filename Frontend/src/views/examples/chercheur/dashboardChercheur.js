@@ -6,7 +6,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  Button,
   ButtonGroup,
   Table,
   Input,
@@ -21,8 +20,9 @@ import {
   PaginationItem,
   PaginationLink,
   Progress,
+  Button,
 } from "reactstrap";
-import Header from "components/Headers/Header";
+import ChercheurHeader from "components/Headers/ChercheurHeader";
 import { getAdminEvaluations, downloadAdminEvaluations } from "services/api";
 
 // Convertit une URL Vimeo en URL embarquée
@@ -42,7 +42,7 @@ const evaluationCriteria = [
   { label: "Sécurité", key: "safe", color: "success" },
 ];
 
-const AdminEvaluations = () => {
+const ChercheurEvaluations = () => {
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,14 +109,6 @@ const AdminEvaluations = () => {
     currentPage * itemsPerPage
   );
 
-  // Télécharger les évaluations
-  const handleDownload = async () => {
-    const result = await downloadAdminEvaluations();
-    if (result.error) {
-      setError("Erreur lors du téléchargement: " + result.message);
-    }
-  };
-
   // Voir les détails d'une évaluation
   const handleViewDetails = (evaluation) => {
     console.log("Détails de l'évaluation:", evaluation);
@@ -135,10 +127,16 @@ const AdminEvaluations = () => {
       (evaluation.depressing || 0)
     );
   };
+  // Télécharger les évaluations
+  const handleDownload = async () => {
+    const result = await downloadAdminEvaluations();
+    if (result.error) {
+      setError("Erreur lors du téléchargement: " + result.message);
+    }
+  };
 
   return (
     <>
-      <Header />
       <Container className="mt--7" fluid>
         <Row>
           <Col>
@@ -146,7 +144,11 @@ const AdminEvaluations = () => {
               <CardHeader className="border-0">
                 <Row className="align-items-center">
                   <div className="col">
-                    <h3 className="mb-0">Toutes les évaluations</h3>
+                    <h3 className="mb-0">Consultation des évaluations</h3>
+                    <p className="text-muted mb-0">
+                      Consultez toutes les évaluations disponibles pour vos
+                      recherches
+                    </p>
                   </div>
                   <div className="col text-right">
                     <Button color="primary" onClick={handleDownload}>
@@ -165,7 +167,7 @@ const AdminEvaluations = () => {
                         <i className="fas fa-search"></i>
                       </InputGroupText>
                       <Input
-                        placeholder="Rechercher par utilisateur, lieu, commentaire..."
+                        placeholder="Rechercher par lieu,date..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
@@ -233,8 +235,9 @@ const AdminEvaluations = () => {
                       <thead className="thead-light">
                         <tr>
                           <th scope="col">ID</th>
-                          <th scope="col">Utilisateur</th>
+                          
                           <th scope="col">Date</th>
+                          <th scope="col">Lieu</th>
                           <th scope="col">Type</th>
                           <th scope="col">Score</th>
                           <th scope="col">Actions</th>
@@ -255,13 +258,14 @@ const AdminEvaluations = () => {
                           return (
                             <tr key={evaluation.id}>
                               <td>{evaluation.id.substring(0, 8)}...</td>
-                              <td>
-                                <div>{evaluation.evaluator_email}</div>
-                              </td>
+                               
                               <td>
                                 {new Date(
                                   evaluation.created_at
-                                ).toLocaleString()}
+                                ).toLocaleDateString()}
+                              </td>
+                              <td>
+                                {evaluation.media_info?.place || "Non spécifié"}
                               </td>
                               <td>
                                 <Badge
@@ -285,7 +289,7 @@ const AdminEvaluations = () => {
                                   size="sm"
                                   onClick={() => handleViewDetails(evaluation)}
                                 >
-                                  <i className="fas fa-eye"></i> Voir
+                                  <i className="fas fa-eye"></i> Consulter
                                 </Button>
                               </td>
                             </tr>
@@ -350,8 +354,8 @@ const AdminEvaluations = () => {
               <Col md="6">
                 {selectedEvaluation.media_info?.type === "video" ? (
                   <div
-                    className="  mb-3"
-    
+                    className="mb-3"
+                     
                   >
                     <iframe
                       src={convertToVimeoEmbed(
@@ -361,11 +365,11 @@ const AdminEvaluations = () => {
                       allowFullScreen
                       frameBorder="0"
                       style={{
+            
                         width: "100%",
                         height: "300px",
                         border: "none",
                       }}
-                      className="rounded"
                     />
                   </div>
                 ) : (
@@ -468,4 +472,4 @@ const AdminEvaluations = () => {
   );
 };
 
-export default AdminEvaluations;
+export default ChercheurEvaluations;

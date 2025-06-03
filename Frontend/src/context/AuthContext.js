@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, registerUser, getUserProfile } from "../services/api";
+import { loginUser, registerUser, getProfile } from "../services/api";
 
 const AuthContext = createContext();
 
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
         const fetchUserProfile = async () => {
           try {
             // Récupérer le profil utilisateur
-            const profile = await getUserProfile(accessToken);
+            const profile = await getProfile(accessToken);
             const userData = { role: userRole, ...profile };
             setUser(userData);
           } catch (error) {
@@ -50,6 +50,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Fonction de login
+  // Fonction de login
   const login = async (email, password) => {
     try {
       setLoading(true);
@@ -58,46 +59,51 @@ export const AuthProvider = ({ children }) => {
       const res = await loginUser(email, password);
       console.log("Réponse de l'API après connexion:", res);
 
-      // 2. Extraire les données de la réponse
-      const { access, refresh, userRole } = res;
-
-      if (!access || !refresh || !userRole) {
-        throw new Error("Données utilisateur manquantes dans la réponse.");
+      // 2. Vérifier s'il y a une erreur
+      if (res.error) {
+        throw new Error(res.message); // ← Laisser remonter l'erreur
       }
 
-      // 3. Stocker les tokens + rôle
+      // 3. Extraire les données de la réponse
+      const { access, refresh, userRole } = res.data;
+
+      // 4. Stocker les tokens + rôle
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
       localStorage.setItem("userRole", userRole);
 
       console.log("Rôle utilisateur:", userRole);
 
-      // 4. Récupérer profil SEULEMENT si évaluateur
+      // 5. Récupérer profil
       let userData = { role: userRole };
-      if (userRole === "evaluator") {
-        const profile = await getUserProfile(access);
+      try {
+        const profile = await getProfile(access);
         userData = { ...userData, ...profile };
+      } catch (profileError) {
+        console.log("Erreur profil, continue avec rôle seulement");
       }
 
-      // 5. Mise à jour de l'état utilisateur
+      // 6. Mise à jour de l'état utilisateur
       setUser(userData);
 
-      // 6. Redirection
+      // 7. Redirection
       if (userRole === "admin") {
         console.log("Redirection vers /admin/dashboard");
         navigate("/admin/dashboard");
+      } else if (userRole === "chercheur") {
+        console.log("Redirection vers /chercheur/evaluations");
+        navigate("/chercheur/evaluations");
       } else {
         console.log("Redirection vers /evaluator/dashboard");
         navigate("/evaluator/dashboard");
       }
     } catch (error) {
       console.error("Erreur login :", error);
-      alert("Email ou mot de passe incorrect.");
+      throw error; // ← NE PAS faire alert() ici, laisser remonter
     } finally {
       setLoading(false);
     }
   };
-
   // Fonction d'inscription
   const register = async (formData) => {
     try {

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
+from evaluation.models import MediaEvaluation
 from .serializers import RegisterSerializer, LoginSerializer, UserProfileSerializer
 from django.shortcuts import get_object_or_404
 from .utils.email_utils import send_password_reset_email,send_welcome_email_chercheur 
@@ -53,7 +54,14 @@ class LoginView(APIView):
             if serializer.is_valid():
                 user = serializer.validated_data['user']
                 refresh = RefreshToken.for_user(user)
-                user_role = 'admin' if user.is_staff and user.is_superuser else 'evaluator'
+                # Déterminer le rôle utilisateur
+                if user.is_staff and user.is_superuser:
+                    user_role = 'admin'
+                elif user.is_chercheur:
+                    user_role = 'chercheur'
+                else:
+                    user_role = 'evaluator'
+                
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
@@ -218,6 +226,24 @@ class CreateChercheurUserView(APIView):
             send_welcome_email_chercheur(user, password)
             return Response({"message": "Compte chercheur créé avec succès et email envoyé."}, status=201)
         return Response(serializer.errors, status=400)
+class StatsView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        
+        total_users = CustomUser.objects(is_staff=False, is_superuser=False).count()
+        active_users = CustomUser.objects(is_staff=False, is_superuser=False, is_active=True).count()  
+        chercheurs_count = CustomUser.objects(is_staff=False, is_superuser=False, is_chercheur=True).count()
+        total_evaluations = MediaEvaluation.objects().count()
+        
+        data = {
+            'total_users': total_users,
+            'active_users': active_users,
+            'total_evaluations': total_evaluations,
+            'chercheurs_count': chercheurs_count
+        }
+        
+        return Response(data)
     
 
 

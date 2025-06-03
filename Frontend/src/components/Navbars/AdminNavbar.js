@@ -12,8 +12,10 @@ import {
 } from "reactstrap";
 
 const AdminNavbar = () => {
-  const { logout } = useAuth();
-
+  const { user, logout } = useAuth();
+  const handleLogout = () => {
+    logout();
+  };
   return (
     <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
       <Container fluid className="justify-content-end">
@@ -27,11 +29,11 @@ const AdminNavbar = () => {
                     src={require("../../assets/img/theme/team-4-800x800.jpg")}
                   />
                 </span>
-                <Media className="ml-2 d-none d-lg-block">
+                <div className="ml-2 d-lg-block">
                   <span className="mb-0 text-sm font-weight-bold">
-                    Jessica Jones
+                    {user?.prenom} {user?.nom}
                   </span>
-                </Media>
+                </div>
               </Media>
             </DropdownToggle>
 
@@ -40,14 +42,14 @@ const AdminNavbar = () => {
                 <h6 className="text-overflow m-0">Bienvenue !</h6>
               </DropdownItem>
 
-              <DropdownItem to="/admin/user-profile" tag={Link}>
+              <DropdownItem to="/admin/profile" tag={Link}>
                 <i className="ni ni-single-02" />
                 <span>Mon profil</span>
               </DropdownItem>
 
               <DropdownItem divider />
 
-              <DropdownItem onClick={logout}>
+              <DropdownItem onClick={handleLogout}>
                 <i className="ni ni-user-run" />
                 <span>Déconnexion</span>
               </DropdownItem>

@@ -235,3 +235,5 @@ class CompositeMapView(APIView):
             })
 
         return Response({str(year): result})
+    
+
